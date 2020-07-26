@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"restapi/config"
 	"restapi/conn"
+	"restapi/handlers"
 	"restapi/repositories"
 	"restapi/services"
 
@@ -26,13 +27,16 @@ func buildContainer() *dig.Container {
 	container.Provide(repositories.NewArticleRepository)
 	container.Provide(services.NewArticleService)
 
+	//Handlers
+	container.Provide(handlers.NewUserHandler)
+	container.Provide(handlers.NewArticleHandler)
+
 	container.Provide(NewServer)
 	return container
 }
 
 //App :
 type App struct {
-	_ *Server
 }
 
 //NewApp :
@@ -49,8 +53,13 @@ func NewApp() {
 
 //Server :
 type Server struct {
+	//services
 	userService    *services.IUserService
 	articleService *services.IArticleService
+
+	//handlers
+	userHandler    *handlers.UserHandler
+	articleHandler *handlers.ArticleHandler
 }
 
 //NewServer : constructor of Server
@@ -63,6 +72,9 @@ func NewServer(userService services.IUserService, articleService services.IArtic
 
 func (s *Server) handler() http.Handler {
 	router := chi.NewRouter()
+
+	router.Route("/article", s.articleHandler.Handle)
+	router.Route("/user", s.userHandler.Handle)
 	return router
 }
 
