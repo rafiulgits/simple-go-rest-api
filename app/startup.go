@@ -8,6 +8,8 @@ import (
 	"restapi/repositories"
 	"restapi/services"
 
+	"github.com/go-chi/chi/middleware"
+
 	"github.com/go-chi/chi"
 	"go.uber.org/dig"
 )
@@ -60,24 +62,45 @@ type Server struct {
 	//handlers
 	userHandler    *handlers.UserHandler
 	articleHandler *handlers.ArticleHandler
+
+	//
+	router    *chi.Mux
+	dbContext *conn.DB
 }
 
 //NewServer : constructor of Server
-func NewServer(userService services.IUserService, articleService services.IArticleService) *Server {
+func NewServer(
+	userService services.IUserService,
+	articleService services.IArticleService,
+	dbContext *conn.DB) *Server {
 	return &Server{
 		userService:    &userService,
 		articleService: &articleService,
+		dbContext:      dbContext,
+		router:         chi.NewRouter(),
 	}
 }
 
-func (s *Server) handler() http.Handler {
-	router := chi.NewRouter()
+func (s *Server) setMiddlewares() {
+	s.router.Use(middleware.Logger)
+	s.router.Use(middleware.RealIP)
 
-	router.Route("/article", s.articleHandler.Handle)
-	router.Route("/user", s.userHandler.Handle)
-	return router
+	s.dbContext.AutoMigrate()
+}
+
+func (s *Server) mapHandlers() {
+	s.router.Route("/article", s.articleHandler.Handle)
+	s.router.Route("/user", s.userHandler.Handle)
+}
+
+func (s *Server) dispose() {
+	_ = s.dbContext.Close()
 }
 
 func (s *Server) run() {
-	http.ListenAndServe(":8080", s.handler())
+	s.setMiddlewares()
+	s.mapHandlers()
+	defer s.dispose()
+	http.ListenAndServe(":8080", s.router)
+
 }

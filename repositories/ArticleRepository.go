@@ -1,7 +1,6 @@
 package repositories
 
 import (
-	"fmt"
 	"restapi/conn"
 	"restapi/models"
 )
@@ -19,7 +18,6 @@ type ArticleRepository struct {
 
 //NewArticleRepository :
 func NewArticleRepository(db *conn.DB) IArticleRepository {
-	fmt.Println("injected")
 	return &ArticleRepository{
 		&BaseRepository{
 			db: db.Table("Articles"),
