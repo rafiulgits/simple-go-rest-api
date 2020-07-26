@@ -8,6 +8,7 @@ import (
 //IArticleService :
 type IArticleService interface {
 	GetArticleByID(id uint) (*models.Article, error)
+	GetAll() ([]*models.Article, error)
 }
 
 //ArticleService :
@@ -25,4 +26,9 @@ func NewArticleService(articleRepository repositories.IArticleRepository) IArtic
 //GetArticleByID :
 func (service *ArticleService) GetArticleByID(id uint) (*models.Article, error) {
 	return service.ArticleRepository.Get(id)
+}
+
+//GetAll :
+func (service *ArticleService) GetAll() ([]*models.Article, error) {
+	return service.ArticleRepository.GetAll()
 }

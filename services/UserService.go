@@ -8,6 +8,7 @@ import (
 //IUserService :
 type IUserService interface {
 	GetUserByID(id uint) (*models.User, error)
+	GetAll() ([]*models.User, error)
 }
 
 //UserService :
@@ -25,4 +26,9 @@ func NewUserService(userRepository repositories.IUserRepository) IUserService {
 //GetUserByID :
 func (service *UserService) GetUserByID(id uint) (*models.User, error) {
 	return service.UserRepository.Get(id)
+}
+
+//GetAll :
+func (service *UserService) GetAll() ([]*models.User, error) {
+	return service.UserRepository.GetAll()
 }

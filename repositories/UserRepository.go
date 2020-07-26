@@ -32,5 +32,10 @@ func (repo *UserRepository) Get(id uint) (*models.User, error) {
 
 //GetAll :
 func (repo *UserRepository) GetAll() ([]*models.User, error) {
-	return []*models.User{}, nil
+	var users []*models.User
+	err := repo.db.Find(&users).Error
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
 }

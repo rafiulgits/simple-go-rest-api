@@ -32,5 +32,11 @@ func (repo *ArticleRepository) Get(id uint) (*models.Article, error) {
 
 //GetAll : Getll all articles
 func (repo *ArticleRepository) GetAll() ([]*models.Article, error) {
-	return []*models.Article{}, nil
+	var articles []*models.Article
+	err := repo.db.Find(&articles).Error
+	if err != nil {
+		return nil, err
+	}
+	return articles, nil
+
 }

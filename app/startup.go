@@ -55,13 +55,9 @@ func NewApp() {
 
 //Server :
 type Server struct {
-	//services
-	userService    *services.IUserService
-	articleService *services.IArticleService
-
 	//handlers
-	userHandler    *handlers.UserHandler
-	articleHandler *handlers.ArticleHandler
+	userHandler    handlers.IUserHandler
+	articleHandler handlers.IArticleHandler
 
 	//
 	router    *chi.Mux
@@ -70,14 +66,17 @@ type Server struct {
 
 //NewServer : constructor of Server
 func NewServer(
-	userService services.IUserService,
-	articleService services.IArticleService,
+	userHandler handlers.IUserHandler,
+	articleHandler handlers.IArticleHandler,
+
 	dbContext *conn.DB) *Server {
+
 	return &Server{
-		userService:    &userService,
-		articleService: &articleService,
-		dbContext:      dbContext,
-		router:         chi.NewRouter(),
+		userHandler:    userHandler,
+		articleHandler: articleHandler,
+
+		dbContext: dbContext,
+		router:    chi.NewRouter(),
 	}
 }
 
@@ -85,7 +84,7 @@ func (s *Server) setMiddlewares() {
 	s.router.Use(middleware.Logger)
 	s.router.Use(middleware.RealIP)
 
-	s.dbContext.AutoMigrate()
+	s.dbContext.Migration()
 }
 
 func (s *Server) mapHandlers() {

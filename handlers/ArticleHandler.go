@@ -7,13 +7,18 @@ import (
 	"github.com/go-chi/chi"
 )
 
+//IArticleHandler :
+type IArticleHandler interface {
+	IHandler
+}
+
 //ArticleHandler :
 type ArticleHandler struct {
-	articleService *services.IArticleService
+	articleService services.IArticleService
 }
 
 //NewArticleHandler :
-func NewArticleHandler(articleService *services.IArticleService) IHandler {
+func NewArticleHandler(articleService services.IArticleService) IArticleHandler {
 	return &ArticleHandler{
 		articleService: articleService,
 	}
@@ -22,8 +27,13 @@ func NewArticleHandler(articleService *services.IArticleService) IHandler {
 //Handle :
 func (h *ArticleHandler) Handle(router chi.Router) {
 	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		d, e := h.articleService.GetAll()
+		if e != nil {
+			NotFound(w, r)
+			return
+		}
 		w.WriteHeader(http.StatusOK)
 		w.Header().Set("Content-Type", "application/json")
-		w.Write([]byte("{}"))
+		JSONResponse(w, d)
 	})
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"restapi/config"
+	"restapi/models"
 	"sync"
 
 	"github.com/jinzhu/gorm"
@@ -44,7 +45,7 @@ func ConnectDB(config *config.DBConfig) *DB {
 	return dbInstance
 }
 
-//AutoMigration :
-func AutoMigration(db *DB) {
-	db.AutoMigrate()
+//Migration : auto migrate data models
+func (db *DB) Migration() {
+	db.AutoMigrate(&models.User{}, &models.Article{})
 }
