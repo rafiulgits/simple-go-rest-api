@@ -27,7 +27,13 @@ func NewArticleRepository(db *conn.DB) IArticleRepository {
 
 //Get : Get an article by Id
 func (repo *ArticleRepository) Get(id uint) (*models.Article, error) {
-	return nil, nil
+	var article models.Article
+	err := repo.db.First(&article, id).Error
+	if err != nil {
+		return nil, err
+	}
+	return &article, nil
+
 }
 
 //GetAll : Getll all articles

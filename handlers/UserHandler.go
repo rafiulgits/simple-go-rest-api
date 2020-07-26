@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"restapi/handlers/param"
 	"restapi/services"
 
 	"github.com/go-chi/chi"
@@ -26,14 +27,25 @@ func NewUserHandler(userService services.IUserService) IUserHandler {
 
 //Handle :
 func (h *UserHandler) Handle(router chi.Router) {
-	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		d, e := h.userService.GetAll()
-		if e != nil {
-			NotFound(w, r)
-			return
-		}
-		w.WriteHeader(http.StatusOK)
-		w.Header().Set("Content-Type", "application/json")
-		JSONResponse(w, d)
-	})
+	router.Get("/", h.getAllUser)
+	router.Get("/{id}", h.getUserByID)
+}
+
+func (h *UserHandler) getAllUser(w http.ResponseWriter, r *http.Request) {
+	d, e := h.userService.GetAll()
+	if e != nil {
+		NotFound(w, r)
+		return
+	}
+	Ok(w, d)
+}
+
+func (h *UserHandler) getUserByID(w http.ResponseWriter, r *http.Request) {
+	id := param.UInt(r, "id")
+	d, e := h.userService.GetUserByID(id)
+	if e != nil {
+		NotFound(w, r)
+		return
+	}
+	Ok(w, d)
 }

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"restapi/handlers/param"
 	"restapi/services"
 
 	"github.com/go-chi/chi"
@@ -26,14 +27,25 @@ func NewArticleHandler(articleService services.IArticleService) IArticleHandler 
 
 //Handle :
 func (h *ArticleHandler) Handle(router chi.Router) {
-	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		d, e := h.articleService.GetAll()
-		if e != nil {
-			NotFound(w, r)
-			return
-		}
-		w.WriteHeader(http.StatusOK)
-		w.Header().Set("Content-Type", "application/json")
-		JSONResponse(w, d)
-	})
+	router.Get("/", h.getAllArticles)
+	router.Get("/{id}", h.getArticleByID)
+}
+
+func (h *ArticleHandler) getAllArticles(w http.ResponseWriter, r *http.Request) {
+	d, e := h.articleService.GetAll()
+	if e != nil {
+		NotFound(w, r)
+		return
+	}
+	Ok(w, d)
+}
+
+func (h *ArticleHandler) getArticleByID(w http.ResponseWriter, r *http.Request) {
+	id := param.UInt(r, "id")
+	d, e := h.articleService.GetArticleByID(id)
+	if e != nil {
+		NotFound(w, r)
+		return
+	}
+	Ok(w, d)
 }

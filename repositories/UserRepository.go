@@ -27,7 +27,12 @@ func NewUserRepository(db *conn.DB) IUserRepository {
 
 //Get :
 func (repo *UserRepository) Get(id uint) (*models.User, error) {
-	return nil, nil
+	var user models.User
+	err := repo.db.Where("id = ?", id).First(&user).Error
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
 }
 
 //GetAll :
