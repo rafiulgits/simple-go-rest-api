@@ -9,6 +9,7 @@ import (
 type IArticleRepository interface {
 	Get(id uint) (*models.Article, error)
 	GetAll() ([]*models.Article, error)
+	Create(a *models.Article) (*models.Article, error)
 }
 
 //ArticleRepository :
@@ -44,5 +45,17 @@ func (repo *ArticleRepository) GetAll() ([]*models.Article, error) {
 		return nil, err
 	}
 	return articles, nil
+}
 
+//Create :
+func (repo *ArticleRepository) Create(a *models.Article) (*models.Article, error) {
+	var err error
+	if repo.db.NewRecord(a) {
+		repo.db.Create(&a)
+		if !repo.db.NewRecord(a) {
+			return a, nil
+		}
+		return nil, err
+	}
+	return nil, err
 }

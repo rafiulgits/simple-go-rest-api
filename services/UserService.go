@@ -9,6 +9,8 @@ import (
 type IUserService interface {
 	GetUserByID(id uint) (*models.User, error)
 	GetAll() ([]*models.User, error)
+	CreateUser(u *models.User) (*models.User, error)
+	DeleteUser(id uint) error
 }
 
 //UserService :
@@ -31,4 +33,14 @@ func (service *UserService) GetUserByID(id uint) (*models.User, error) {
 //GetAll :
 func (service *UserService) GetAll() ([]*models.User, error) {
 	return service.UserRepository.GetAll()
+}
+
+//CreateUser :
+func (service *UserService) CreateUser(u *models.User) (*models.User, error) {
+	return service.UserRepository.Create(u)
+}
+
+//DeleteUser :
+func (service *UserService) DeleteUser(id uint) error {
+	return service.UserRepository.Delete(id)
 }

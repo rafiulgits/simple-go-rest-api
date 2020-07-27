@@ -25,3 +25,15 @@ func Ok(w http.ResponseWriter, d interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(w).Encode(d)
 }
+
+//Created : HTTP 201 response
+func Created(w http.ResponseWriter, d interface{}, url string) {
+	w.WriteHeader(http.StatusCreated)
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(d)
+}
+
+//NoContent : HTTP 204 response
+func NoContent(w http.ResponseWriter) {
+	w.WriteHeader(http.StatusNoContent)
+}

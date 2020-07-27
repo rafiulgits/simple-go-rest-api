@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"encoding/json"
 	"net/http"
 	"restapi/handlers/param"
+	"restapi/models"
 	"restapi/services"
 
 	"github.com/go-chi/chi"
@@ -28,7 +30,11 @@ func NewArticleHandler(articleService services.IArticleService) IArticleHandler 
 //Handle :
 func (h *ArticleHandler) Handle(router chi.Router) {
 	router.Get("/", h.getAllArticles)
-	router.Get("/{id}", h.getArticleByID)
+	router.Post("/", h.createArticle)
+
+	router.Route("/{id}", func(router chi.Router) {
+		router.Get("/", h.getArticleByID)
+	})
 }
 
 func (h *ArticleHandler) getAllArticles(w http.ResponseWriter, r *http.Request) {
@@ -48,4 +54,18 @@ func (h *ArticleHandler) getArticleByID(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	Ok(w, d)
+}
+
+func (h *ArticleHandler) createArticle(w http.ResponseWriter, r *http.Request) {
+	var article models.Article
+	err := json.NewDecoder(r.Body).Decode(&article)
+	if err != nil {
+		panic(err)
+	}
+	d, e := h.articleService.CreateArticle(&article)
+	if e != nil {
+		NotFound(w, r)
+		return
+	}
+	Created(w, d, "")
 }

@@ -9,6 +9,8 @@ import (
 type IUserRepository interface {
 	Get(id uint) (*models.User, error)
 	GetAll() ([]*models.User, error)
+	Create(u *models.User) (*models.User, error)
+	Delete(id uint) error
 }
 
 //UserRepository :
@@ -43,4 +45,28 @@ func (repo *UserRepository) GetAll() ([]*models.User, error) {
 		return nil, err
 	}
 	return users, nil
+}
+
+//Create :
+func (repo *UserRepository) Create(u *models.User) (*models.User, error) {
+	var err error
+	if repo.db.NewRecord(u) {
+		repo.db.Create(&u)
+		if !repo.db.NewRecord(u) {
+			return u, nil
+		}
+		return nil, err
+	}
+	return nil, err
+}
+
+//Delete :
+func (repo *UserRepository) Delete(id uint) error {
+	var user models.User
+	err := repo.db.Where("id = ?", id).First(&user).Error
+	if err != nil {
+		return err
+	}
+	e := repo.db.Delete(&user).Error
+	return e
 }
